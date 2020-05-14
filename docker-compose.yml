@@ -1,0 +1,24 @@
+version: '3.2'
+services:
+    db:
+        image: postgres:latest
+        container_name: sb_db # "Spring Boot 用のDB" という意味の任意の名前
+        restart: always
+        # ports:
+        #     - 5432:5432 # 今回はコンテナ同士でつなぐだけなのでコメントアウト
+        environment:
+            POSTGRES_USER: 'dev' # DBのユーザー名（＝DB名）
+            POSTGRES_PASSWORD: 'pass' # DBのパスワード
+        volumes:
+            - "./docker/db/initdb:/docker-entrypoint-initdb.d"
+    java:
+        image: openjdk:11
+        container_name: sb
+        restart: always
+        ports:
+            - 8080:8080 # ホストからデバッグできるようにポートフォーワード
+        tty: true
+        depends_on:
+            - db
+        volumes:
+            - "./docker/java/src:/usr/local/src"
